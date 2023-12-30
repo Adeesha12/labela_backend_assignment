@@ -14,8 +14,33 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from rest_framework import permissions
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.views import obtain_auth_token
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="auto company API",
+        default_version='v1',
+        description="auto company ecommerce API ",
+        terms_of_service="https://yourapp.com/terms/",
+        contact=openapi.Contact(email="contact@yourapp.com"),
+        license=openapi.License(name="Your License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+    authentication_classes=[TokenAuthentication],
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('products/', include('products.urls')),
+    path('carts/', include('carts.urls')),
+    path('orders/', include('orders.urls')),
+    path('api/token/', obtain_auth_token, name='obtain_auth_token'),
+    path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
